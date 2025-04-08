@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use App\Repository\ImageRepository;
 
 class ImageController extends AbstractController
 {
@@ -50,4 +51,15 @@ class ImageController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+    #[Route('/images', name: 'app_images')]
+    public function list(ImageRepository $imageRepository): Response
+    {
+        $images = $imageRepository->findAll();
+
+        return $this->render('image/list.html.twig', [
+            'images' => $images,
+        ]);
+    }
+
 }

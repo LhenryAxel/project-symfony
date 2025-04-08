@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des images{% endblock %}
+
+{% block body %}
+    <h1>Liste des images</h1>
+
+    <div class="image-gallery">
+        {% for image in images %}
+            <div class="image-block">
+                <img src="{{ asset('uploads/' ~ image.filename) }}" alt="Image" width="200">
+                <p>{{ image.filename }}</p>
+                <p>Uploadé le : {{ image.uploadedAt|date('d/m/Y H:i') }}</p>
+            </div>
+        {% else %}
+            <p>Aucune image disponible.</p>
+        {% endfor %}
+    </div>
+{% endblock %}
