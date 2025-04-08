@@ -40,6 +40,12 @@ class ImageController extends AbstractController
                 ],
             ]);
 
+            if ($response->getStatusCode() === 201) {
+                return $this->render('image/upload.html.twig', [
+                    'success' => true
+                ]);
+            }    
+
             return new Response('Erreur lors de l\'upload vers l’API', 500);
         }
 
