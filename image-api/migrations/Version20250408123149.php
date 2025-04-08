@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250408100044 extends AbstractMigration
+final class Version20250408123149 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -21,7 +21,7 @@ final class Version20250408100044 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            CREATE TABLE image (id INT AUTO_INCREMENT NOT NULL, filename VARCHAR(255) DEFAULT NULL, uploaded_at DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)', PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            CREATE TABLE image (id INT AUTO_INCREMENT NOT NULL, filename VARCHAR(255) NOT NULL, uploaded_at DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)', PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
             CREATE TABLE stat (id INT AUTO_INCREMENT NOT NULL, image_id INT NOT NULL, hit_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)', INDEX IDX_20B8FF213DA5256D (image_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
@@ -31,6 +31,18 @@ final class Version20250408100044 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE stat ADD CONSTRAINT FK_20B8FF213DA5256D FOREIGN KEY (image_id) REFERENCES image (id)
+        SQL);
+        $this->addSql(<<<'SQL'
+        CREATE TABLE type_stat (id INT AUTO_INCREMENT NOT NULL, type VARCHAR(50) DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+        SQL);        
+        $this->addSql(<<<'SQL'
+            ALTER TABLE stat ADD id_type_id INT NOT NULL
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE stat ADD CONSTRAINT FK_20B8FF211BD125E3 FOREIGN KEY (id_type_id) REFERENCES type_stat (id)
+        SQL);
+        $this->addSql(<<<'SQL'
+            CREATE INDEX IDX_20B8FF211BD125E3 ON stat (id_type_id)
         SQL);
     }
 
@@ -48,6 +60,18 @@ final class Version20250408100044 extends AbstractMigration
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE messenger_messages
+        SQL);
+        $this->addSql(<<<'SQL'
+            DROP TABLE type_stat
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE stat DROP FOREIGN KEY FK_20B8FF211BD125E3
+        SQL);
+        $this->addSql(<<<'SQL'
+            DROP INDEX IDX_20B8FF211BD125E3 ON stat
+        SQL);
+        $this->addSql(<<<'SQL'
+            ALTER TABLE stat DROP id_type_id
         SQL);
     }
 }
