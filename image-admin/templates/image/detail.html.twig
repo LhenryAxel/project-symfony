@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	<main>
+		<h1>{{ image.filename }}</h1>
+		<img src="{{ image.url }}" alt="Image" width="200" />
+		<p>
+			Date : {{ image.uploaded_at|date('Y-m-d H:i:s') }}
+		</p>
+	</main>
+{% endblock %}
