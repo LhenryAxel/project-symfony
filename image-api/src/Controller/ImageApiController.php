@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Image;
+use App\Entity\Stat;
+use App\Enum\TypeStat;
 use App\Repository\ImageRepository;
 use App\Repository\TypeStatRepository;
 use App\Repository\StatRepository;
@@ -27,7 +29,7 @@ class ImageApiController extends AbstractController
         $data = array_map(fn($img) => [
             'id' => $img->getId(),
             'filename' => $img->getFilename(),
-            'url' => 'http://localhost:8002/view/' . $img->getFilename(),
+            'url' => 'http://localhost:8002/image/url/' . $img->getFilename(),
         ], $images);
 
         return new JsonResponse($data);
@@ -60,10 +62,15 @@ class ImageApiController extends AbstractController
     }
     
     // Renvoie les info d'une Image basé sur son nom de fichier.
-    #[Route('/api/image/{filename}', name: 'api_image_view', methods: ['GET'])]
-    public function getImage(string $filename, ImageRepository $repo): JsonResponse
+    #[Route('/api/image/view/{filename}', name: 'api_image_view', methods: ['GET'])]
+    public function getImageData(
+        string $filename,
+        ImageRepository $imageRepo,
+        TypeStatRepository $typeStatRepo,
+        EntityManagerInterface $em
+        ): JsonResponse
     {
-        $image = $repo->findOneBy(['filename' => $filename]);
+        $image = $imageRepo->findOneBy(['filename' => $filename]);
     
         if (!$image) {
             throw new NotFoundHttpException('Image not found');
@@ -72,36 +79,111 @@ class ImageApiController extends AbstractController
         $data = [
             'id' => $image->getId(),
             'filename' => $image->getFilename(),
-            'url' => 'http://localhost:8002/view/' . $image->getFilename(),
+            'url' => 'http://localhost:8002/image/url/' . $image->getFilename(),
         ];
+
+        $recordStatResponse = $this->recordStat($filename, TypeStat::Vue->value, $imageRepo, $typeStatRepo, $em);
+        if ($recordStatResponse->getStatusCode() != 201) {
+            return json_decode($response->getContent(), true);
+        }
     
         return new JsonResponse($data);
     }
 
     // Revoie le fichier de l'image directement.
-    #[Route('/view/{filename}', name: 'view_image', methods: ['GET'])]
-    public function viewImage(string $filename): BinaryFileResponse
+    #[Route('/api/image/url/{filename}', name: 'api-image-url', methods: ['GET'])]
+    public function getImageOnly(
+        string $filename,
+        ImageRepository $imageRepo,
+        TypeStatRepository $typeStatRepo,
+        EntityManagerInterface $em
+        ): BinaryFileResponse
     {
         $filePath = $this->getParameter('kernel.project_dir') . '/public/uploads/' . $filename;
 
         if (!file_exists($filePath)) {
             throw $this->createNotFoundException('Image not found');
         }
+        $recordStatResponse = $this->recordStat($filename, TypeStat::RequeteUrl->value, $imageRepo, $typeStatRepo, $em);
+        if ($recordStatResponse->getStatusCode() != 201) {
+            throw new \RuntimeException('Erreur serveur lors de la récupération du fichier');
+        }
 
         return new BinaryFileResponse($filePath, 200, [], false);
     }
 
+    // Revoie les stats pour toutes les images
+    #[Route('/api/stat/all', name: 'api-stat_all', methods: ['GET'])]
+    public function getAllImageStats(
+        TypeStatRepository $typeStatRepo,
+        ImageRepository $imageRepo,
+        StatRepository $statRepo
+    ): JsonResponse
+    {
+        $images = $imageRepo->findAll();
+        $typeView = $typeStatRepo->find(TypeStat::Vue->value);
+        $typeRequest = $typeStatRepo->find(TypeStat::RequeteUrl->value);
+        
+        $data = [];
+
+        // Pour chaque image, on récupère les stats
+        foreach ($images as $image) {
+            $statsForView = $statRepo->findByImageAndType($image, $typeView);
+            $statsForRequest = $statRepo->findByImageAndType($image, $typeRequest);
+
+            $data[] = [
+                'filename' => $image->getFilename(),
+                'view' => count($statsForView),
+                'request' => count($statsForRequest),
+            ];
+        }
+        return new JsonResponse($data);
+    }
+
+
+    // Revoie les stats d'une image
+    // $filename = "l'image concerné
+    #[Route('/api/stat/{filename}', name: 'api-stat_image', methods: ['GET'])]
+    public function getImageStat(
+        string $filename,
+        TypeStatRepository $typeStatRepo,
+        ImageRepository $imageRepo,
+        StatRepository $statRepo,
+        EntityManagerInterface $em
+        ): JsonResponse
+    {
+        $image = $imageRepo->findOneBy(['filename' => $filename]);
+        $typeView = $typeStatRepo->find(TypeStat::Vue->value);
+        $typeRequest = $typeStatRepo->find(TypeStat::RequeteUrl->value);
+    
+        if (!$image) {
+            throw new NotFoundHttpException('Image not found');
+        }
+
+        $statsForView = $statRepo->findByImageAndType($image, $typeView);
+        $statsForRequest = $statRepo->findByImageAndType($image, $typeRequest);
+    
+        $data = [
+            'filename' => $image->getFilename(),
+            'view' => count($statsForView),
+            'request' => count($statsForRequest),
+        ];
+    
+        return new JsonResponse($data);
+    }
+
     // Ajoute une donnée dans la table Stat. 
-    // $imageId = "l'image concerné
+    // $filename = "l'image concerné
     // $typeId  = "le type de stat"
     public function recordStat(
-        int $imageId,
+        string $filename,
         int $typeId,
         ImageRepository $imageRepo,
         TypeStatRepository $typeStatRepo,
         EntityManagerInterface $em
     ): JsonResponse {
-        $image = $imageRepo->find($imageId);
+
+        $image = $imageRepo->findOneBy(['filename' => $filename]);
         $type = $typeStatRepo->find($typeId);
     
         if (!$image || !$type) {
@@ -118,7 +200,4 @@ class ImageApiController extends AbstractController
     
         return new JsonResponse(['status' => 'Stat recorded'], 201);
     }
-
-    // TODO :   -appeller recordStat dans les routes necessaire.
-    //          - ajouter des données à TypeStat par default.
 }

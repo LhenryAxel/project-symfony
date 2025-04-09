@@ -44,6 +44,15 @@ final class Version20250408123149 extends AbstractMigration
         $this->addSql(<<<'SQL'
             CREATE INDEX IDX_20B8FF211BD125E3 ON stat (id_type_id)
         SQL);
+        $this->addSql(<<<'SQL'
+            INSERT INTO type_stat (type) VALUES ('Vue')
+        SQL);
+        $this->addSql(<<<'SQL'
+            INSERT INTO type_stat (type) VALUES ('Telechargement')
+        SQL);
+        $this->addSql(<<<'SQL'
+            INSERT INTO type_stat (type) VALUES ('RequeteUrl')
+        SQL);
     }
 
     public function down(Schema $schema): void
