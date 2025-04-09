@@ -6,7 +6,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Serializer\SerializerInterface;
+use App\Entity\Image;
 
 #[Route('/images')]
 class ImageController extends AbstractController
@@ -18,11 +19,20 @@ class ImageController extends AbstractController
 		$this->client = $client;
 	}
 
-	#[Route('/', name: 'images', methods: ['GET'])]
-	public function list(): Response
+	#[Route('', name: 'images', methods: ['GET'])]
+	public function list(SerializerInterface $serializer): Response
 	{
 		$response = $this->client->request('GET', 'http://localhost:8002/api/images');
-		$images = $response->toArray();
+
+		if ($response->getStatusCode() !== 200) {
+			return new Response('Erreur lors de la récupération des images', 500);
+		}
+
+		$images = $serializer->deserialize(
+			$response->getContent(), 
+			Image::class.'[]', 
+			'json'
+		);
 	
 		return $this->render('image/list.html.twig', [
 			'images' => $images,
@@ -31,11 +41,19 @@ class ImageController extends AbstractController
 
 
 	#[Route('/{id}', name: 'images_details', methods: ['GET'])]
-	public function details(int $id): Response
+	public function details(int $id, SerializerInterface $serializer): Response
 	{
 		$response = $this->client->request('GET', "http://localhost:8002/api/images/$id");
 
-		$image = $response->toArray();
+		if ($response->getStatusCode() !== 200) {
+			return new Response('Erreur lors de la récupération des images', 500);
+		}
+
+		$image = $serializer->deserialize(
+			$response->getContent(), 
+			Image::class, 
+			'json'
+		);
 	
 		return $this->render('image/list.html.twig', [
 			'image' => $image,
