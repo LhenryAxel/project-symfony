@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Stat;
+use App\Entity\Image;
+use App\Entity\TypeStat;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -15,7 +17,19 @@ class StatRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Stat::class);
     }
-
+    /**
+    * @return Stat[] Returns an array of Stat objects
+    */
+    public function findByImageAndType(Image $image, TypeStat $type): array
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.image = :image')
+            ->andWhere('s.id_type = :type')
+            ->setParameter('image', $image)
+            ->setParameter('type', $type)
+            ->getQuery()
+            ->getResult();
+    }
     //    /**
     //     * @return Stat[] Returns an array of Stat objects
     //     */
