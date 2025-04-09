@@ -29,7 +29,7 @@ class ImageApiController extends AbstractController
         $data = array_map(fn($img) => [
             'id' => $img->getId(),
             'filename' => $img->getFilename(),
-            'url' => 'http://localhost:8002/image/url/' . $img->getFilename(),
+            'url' => 'http://localhost:8002/api/image/url/' . $img->getFilename(),
         ], $images);
 
         return new JsonResponse($data);
@@ -79,12 +79,12 @@ class ImageApiController extends AbstractController
         $data = [
             'id' => $image->getId(),
             'filename' => $image->getFilename(),
-            'url' => 'http://localhost:8002/image/url/' . $image->getFilename(),
+            'url' => 'http://localhost:8002/api/image/url/' . $image->getFilename(),
         ];
 
         $recordStatResponse = $this->recordStat($filename, TypeStat::Vue->value, $imageRepo, $typeStatRepo, $em);
         if ($recordStatResponse->getStatusCode() != 201) {
-            return json_decode($response->getContent(), true);
+            return json_decode($recordStatResponse->getContent(), true);
         }
     
         return new JsonResponse($data);
