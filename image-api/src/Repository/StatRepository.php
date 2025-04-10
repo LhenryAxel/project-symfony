@@ -54,4 +54,20 @@ class StatRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+
+    public function findTopDownloadedImages(int $limit = 20): array
+    {
+    $qb = $this->createQueryBuilder('s')
+        ->select('i.filename, COUNT(s.id) AS download_count')
+        ->join('s.image', 'i')
+        ->where('s.idType = :type')
+        ->groupBy('i.id')
+        ->orderBy('download_count', 'DESC')
+        ->setMaxResults($limit)
+        ->setParameter('type', TypeStat::Telechargement->value);
+
+    return $qb->getQuery()->getResult();
+    }
+
 }
