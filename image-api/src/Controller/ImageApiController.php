@@ -112,6 +112,34 @@ class ImageApiController extends AbstractController
         return new BinaryFileResponse($filePath, 200, [], false);
     }
 
+    //Download
+    #[Route('/api/image/download/{filename}', name: 'api-image-download', methods: ['GET'])]
+    public function getDownloadImage(
+        string $filename,
+        ImageRepository $imageRepo,
+        TypeStatRepository $typeStatRepo,
+        EntityManagerInterface $em
+    ): BinaryFileResponse {
+        $filePath = $this->getParameter('kernel.project_dir') . '/public/uploads/' . $filename;
+
+        if (!file_exists($filePath)) {
+            throw $this->createNotFoundException('File not found');
+        }
+
+        $recordStatResponse = $this->recordStat($filename, TypeStat::Telechargement->value, $imageRepo, $typeStatRepo, $em);
+        if ($recordStatResponse->getStatusCode() !== 201) {
+            throw new \RuntimeException('Erreur serveur lors de l\'enregistrement de la stat de téléchargement');
+        }
+
+        $response = new BinaryFileResponse($filePath);
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $filename
+        );
+
+        return $response;
+    }
+
     // Revoie les stats pour toutes les images
     #[Route('/api/stat/all', name: 'api-stat_all', methods: ['GET'])]
     public function getAllImageStats(
@@ -178,6 +206,31 @@ class ImageApiController extends AbstractController
         return new JsonResponse($data);
     }
 
+    // Supprime une image via son Id.
+    #[Route('/api/image/delete/{id}', name: 'api_delete_image', methods: ['DELETE'])]
+    public function deleteImage(
+        int $id,
+        ImageRepository $imageRepo,
+        StatRepository $statRepo,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $image = $imageRepo->find($id);
+
+        if (!$image) {
+            throw new NotFoundHttpException('Image not found');
+        }
+
+        $stats = $statRepo->findBy(['image' => $image]);
+        foreach ($stats as $stat) {
+            $em->remove($stat);
+        }
+
+        $em->remove($image);
+        $em->flush();
+
+        return new JsonResponse(['message' => 'Image and related stats deleted'], 200);
+    }
+
 
     // Ajoute une donnée dans la table Stat. 
     // $filename = "l'image concerné
@@ -208,32 +261,6 @@ class ImageApiController extends AbstractController
         return new JsonResponse(['status' => 'Stat recorded'], 201);
     }
 
-    //Download
-    #[Route('/api/image/download/{filename}', name: 'api-image-download', methods: ['GET'])]
-    public function downloadImage(
-        string $filename,
-        ImageRepository $imageRepo,
-        TypeStatRepository $typeStatRepo,
-        EntityManagerInterface $em
-    ): BinaryFileResponse {
-        $filePath = $this->getParameter('kernel.project_dir') . '/public/uploads/' . $filename;
-
-        if (!file_exists($filePath)) {
-            throw $this->createNotFoundException('File not found');
-        }
-
-        $recordStatResponse = $this->recordStat($filename, TypeStat::Telechargement->value, $imageRepo, $typeStatRepo, $em);
-        if ($recordStatResponse->getStatusCode() !== 201) {
-            throw new \RuntimeException('Erreur serveur lors de l\'enregistrement de la stat de téléchargement');
-        }
-
-        $response = new BinaryFileResponse($filePath);
-        $response->setContentDisposition(
-            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $filename
-        );
-
-        return $response;
-    }
+    
 
 }
