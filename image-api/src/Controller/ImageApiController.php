@@ -118,25 +118,28 @@ class ImageApiController extends AbstractController
         TypeStatRepository $typeStatRepo,
         ImageRepository $imageRepo,
         StatRepository $statRepo
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $images = $imageRepo->findAll();
+
         $typeView = $typeStatRepo->find(TypeStat::Vue->value);
         $typeRequest = $typeStatRepo->find(TypeStat::RequeteUrl->value);
-        
+        $typeDownload = $typeStatRepo->find(TypeStat::Telechargement->value);
+
         $data = [];
 
-        // Pour chaque image, on récupère les stats
         foreach ($images as $image) {
             $statsForView = $statRepo->findByImageAndType($image, $typeView);
             $statsForRequest = $statRepo->findByImageAndType($image, $typeRequest);
+            $statsForDownload = $statRepo->findByImageAndType($image, $typeDownload);
 
             $data[] = [
                 'filename' => $image->getFilename(),
                 'view' => count($statsForView),
                 'request' => count($statsForRequest),
+                'download' => count($statsForDownload),
             ];
         }
+
         return new JsonResponse($data);
     }
 
@@ -150,27 +153,31 @@ class ImageApiController extends AbstractController
         ImageRepository $imageRepo,
         StatRepository $statRepo,
         EntityManagerInterface $em
-        ): JsonResponse
-    {
+    ): JsonResponse {
         $image = $imageRepo->findOneBy(['filename' => $filename]);
-        $typeView = $typeStatRepo->find(TypeStat::Vue->value);
-        $typeRequest = $typeStatRepo->find(TypeStat::RequeteUrl->value);
-    
+
         if (!$image) {
             throw new NotFoundHttpException('Image not found');
         }
 
+        $typeView = $typeStatRepo->find(TypeStat::Vue->value);
+        $typeRequest = $typeStatRepo->find(TypeStat::RequeteUrl->value);
+        $typeDownload = $typeStatRepo->find(TypeStat::Telechargement->value);
+
         $statsForView = $statRepo->findByImageAndType($image, $typeView);
         $statsForRequest = $statRepo->findByImageAndType($image, $typeRequest);
-    
+        $statsForDownload = $statRepo->findByImageAndType($image, $typeDownload);
+
         $data = [
             'filename' => $image->getFilename(),
             'view' => count($statsForView),
             'request' => count($statsForRequest),
+            'download' => count($statsForDownload),
         ];
-    
+
         return new JsonResponse($data);
     }
+
 
     // Ajoute une donnée dans la table Stat. 
     // $filename = "l'image concerné
@@ -200,4 +207,33 @@ class ImageApiController extends AbstractController
     
         return new JsonResponse(['status' => 'Stat recorded'], 201);
     }
+
+    //Download
+    #[Route('/api/image/download/{filename}', name: 'api-image-download', methods: ['GET'])]
+    public function downloadImage(
+        string $filename,
+        ImageRepository $imageRepo,
+        TypeStatRepository $typeStatRepo,
+        EntityManagerInterface $em
+    ): BinaryFileResponse {
+        $filePath = $this->getParameter('kernel.project_dir') . '/public/uploads/' . $filename;
+
+        if (!file_exists($filePath)) {
+            throw $this->createNotFoundException('File not found');
+        }
+
+        $recordStatResponse = $this->recordStat($filename, TypeStat::Telechargement->value, $imageRepo, $typeStatRepo, $em);
+        if ($recordStatResponse->getStatusCode() !== 201) {
+            throw new \RuntimeException('Erreur serveur lors de l\'enregistrement de la stat de téléchargement');
+        }
+
+        $response = new BinaryFileResponse($filePath);
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $filename
+        );
+
+        return $response;
+    }
+
 }

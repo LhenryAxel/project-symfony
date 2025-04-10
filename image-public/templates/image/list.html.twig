@@ -8,6 +8,7 @@
             <li>
                 <img src="{{ image.url }}" alt="Image" width="200" />
                 <p>{{ image.filename }}</p>
+                <a href="http://localhost:8002/api/image/download/{{ image.filename }}" download>Télécharger</a>
             </li>
         {% endfor %}
     </ul>
