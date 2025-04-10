@@ -20,21 +20,13 @@ class ImageController extends AbstractController
 	}
 
 	#[Route('', name: 'images', methods: ['GET'])]
-	public function list(
-		// SerializerInterface $serializer
-	): Response
+	public function list(): Response
 	{
 		$response = $this->client->request('GET', 'http://localhost:8002/api/images');
 
 		if ($response->getStatusCode() !== 200) {
 			return new Response('Erreur lors de la récupération des images', 500);
 		}
-
-		// $images = $serializer->deserialize(
-		// 	$response->getContent(), 
-		// 	Image::class.'[]', 
-		// 	'json'
-		// );
 
 		$images = $response->toArray();
 		
@@ -44,22 +36,18 @@ class ImageController extends AbstractController
 	}
 
 
-	#[Route('/{id}', name: 'images_details', methods: ['GET'])]
-	public function details(int $id, SerializerInterface $serializer): Response
+	#[Route('/{filename}', name: 'images_details', methods: ['GET'])]
+	public function details(string $filename): Response
 	{
-		$response = $this->client->request('GET', "http://localhost:8002/api/images/$id");
+		$response = $this->client->request('GET', "http://127.0.0.1:8002/api/image/view/$filename");
 
 		if ($response->getStatusCode() !== 200) {
 			return new Response('Erreur lors de la récupération des images', 500);
 		}
 
-		$image = $serializer->deserialize(
-			$response->getContent(), 
-			Image::class, 
-			'json'
-		);
+		$image = $response->toArray();
 	
-		return $this->render('image/list.html.twig', [
+		return $this->render('image/detail.html.twig', [
 			'image' => $image,
 		]);
 	}

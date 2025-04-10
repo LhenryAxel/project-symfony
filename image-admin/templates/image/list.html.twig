@@ -26,13 +26,15 @@
 				{% for image in images %}
 					<article class="card bg-base-100 w-96 shadow-sm">
 						<figure>
-							<img src="{{ image.url }}" alt="Shoes" />
+							<img src="{{ image.url }}" alt="Image" />
 						</figure>
 						<div class="card-body">
-							<h3 class="card-title self-center">Card Title</h2>
-							<p>{{ image.filename }}</p>
+							<h3 class="card-title self-center">{{ image.filename }}</h2>
+							{# <p>{{ image.description }}</p> #}
 							<div class="card-actions justify-end">
-								<button class="btn btn-primary">Buy Now</button>
+								<button class="btn btn-primary">
+									<a href="images/{{ image.filename }}">Détails</a>
+								</button>
 							</div>
 						</div>
 					</article>

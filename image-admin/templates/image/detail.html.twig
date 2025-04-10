@@ -1,23 +1,25 @@
 {% extends 'base.html.twig' %}
 
+{% block title %} {{ image.filename }} {% endblock %}
+
 {% block header %}
 	{% include 'navbar.html.twig' %}
 {% endblock %}
 
 {% block main %}
-	<section class="flex flex-row items-center justify-center">
-		<article>
-			<h1>{{ image.filename }}</h1>
+	<section class="flex flex-col items-center justify-center min-h-100 mt-20 gap-4 bg-base-100">
+		<h2 class="text-3xl font-bold">{{ image.filename }}</h1>
+		<article class="card bg-base-100 w-96 shadow-sm">
 			<figure>
-				<img src="{{ image.url }}" alt="Image" width="200" />
+				<img src="{{ image.url }}" alt="Image" />
 			</figure>
 			<p>
-				Date : {{ image.uploaded_at|date('Y-m-d H:i:s') }}
+				{# Date : {{ image.uploadedAt|date('Y-m-d H:i:s') }} #}
 			</p>
 		</article>
 	</section>
 
-	<section class="">
+	<section class="flex flex-col items-center justify-center min-h-100 gap-4 bg-base-100">
 		<h2 class="text-3xl font-bold">Stats de l'image</h1>
 		
 		<div class="stats shadow">
