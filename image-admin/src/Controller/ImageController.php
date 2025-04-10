@@ -20,7 +20,9 @@ class ImageController extends AbstractController
 	}
 
 	#[Route('', name: 'images', methods: ['GET'])]
-	public function list(SerializerInterface $serializer): Response
+	public function list(
+		// SerializerInterface $serializer
+	): Response
 	{
 		$response = $this->client->request('GET', 'http://localhost:8002/api/images');
 
@@ -28,12 +30,14 @@ class ImageController extends AbstractController
 			return new Response('Erreur lors de la récupération des images', 500);
 		}
 
-		$images = $serializer->deserialize(
-			$response->getContent(), 
-			Image::class.'[]', 
-			'json'
-		);
-	
+		// $images = $serializer->deserialize(
+		// 	$response->getContent(), 
+		// 	Image::class.'[]', 
+		// 	'json'
+		// );
+
+		$images = $response->toArray();
+		
 		return $this->render('image/list.html.twig', [
 			'images' => $images,
 		]);

@@ -1,15 +1,43 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
-	<main>
-		<h1>Images disponibles</h1>
-		
-		{% for image in images %}
-			<article>
-				<h3>{# add the name #}</h3>
-				<img src="{{ image.url }}" alt="Image" width="200" />
-				<p>{{ image.filename }}</p>
-			</article>
-		{% endfor %}
+
+
+{% block header %}
+	{% include 'navbar.html.twig' %}
+	<div class="hero bg-base-200 min-h-100">
+		<div class="hero-content text-center">
+			<div class="max-w-md">
+				<h1 class="text-5xl font-bold">Administration</h1>
+				<p class="py-6">
+					
+				</p>
+				<button class="btn btn-primary">Voir les statistiques</button>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block main %}
+	<main class="flex flex-col items-center justity-center bg-base-200">
+		<section class="flex flex-col items-center justity-center">
+			<h2 class="text-3xl font-bold">Images disponibles</h1>
+
+			<div class="flex flex-row items-center justity-center flex-wrap gap-4 p-4">
+				{% for image in images %}
+					<article class="card bg-base-100 w-96 shadow-sm">
+						<figure>
+							<img src="{{ image.url }}" alt="Shoes" />
+						</figure>
+						<div class="card-body">
+							<h3 class="card-title self-center">Card Title</h2>
+							<p>{{ image.filename }}</p>
+							<div class="card-actions justify-end">
+								<button class="btn btn-primary">Buy Now</button>
+							</div>
+						</div>
+					</article>
+				{% endfor %}
+			</div>
+		</section>
 	</main>
 {% endblock %}

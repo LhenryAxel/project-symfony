@@ -17,6 +17,7 @@ class Image
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $filename = null;
+    private ?string $url = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $uploadedAt = null;
@@ -44,6 +45,18 @@ class Image
         $this->filename = $filename;
         return $this;
     }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    public function setUrl(?string $url): static
+    {
+        $this->filename = $url;
+        return $this;
+    }
+
 
     public function getUploadedAt(): ?\DateTimeImmutable
     {
