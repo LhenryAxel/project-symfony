@@ -1,6 +1,7 @@
 {
     "require": {
         "symfony/http-client": "^7.2",
-        "symfony/scheduler": "^7.2"
+        "symfony/scheduler": "^7.2",
+        "phpoffice/phpspreadsheet": "^4.1"
     }
 }
