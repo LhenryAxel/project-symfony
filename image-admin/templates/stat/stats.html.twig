@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block header %}
+    {% include 'navbar.html.twig' %}
+{% endblock %}
+
+{% block main %}
+    <main class="p-10">
+        <h1 class="text-4xl font-bold mb-6">Statistiques des images</h1>
+
+        <table class="table w-full mb-8">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Vues</th>
+                    <th>Requêtes</th>
+                    <th>Téléchargements</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stat in stats %}
+                    <tr>
+                        <td>{{ stat.filename }}</td>
+                        <td>{{ stat.view }}</td>
+                        <td>{{ stat.request }}</td>
+                        <td>{{ stat.download }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <canvas id="statsChart" width="600" height="300"></canvas>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('statsChart').getContext('2d');
+
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ stats|map(s => s.filename)|json_encode|raw }},
+                datasets: [
+                    {
+                        label: 'Vues',
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        data: {{ stats|map(s => s.view)|json_encode|raw }}
+                    },
+                    {
+                        label: 'Requêtes',
+                        backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                        data: {{ stats|map(s => s.request)|json_encode|raw }}
+                    },
+                    {
+                        label: 'Téléchargements',
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                        data: {{ stats|map(s => s.download)|json_encode|raw }}
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Statistiques des images'
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}

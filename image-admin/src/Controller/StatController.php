@@ -6,45 +6,29 @@ use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+
 
 #[Route('/stat')]
 final class StatController extends AbstractController
 {
-	/**
-	 * Main statistics page
-	 */
-	#[Route('/', name: 'app_stat')]
-	public function index(): Response
-	{
-		$stats = [];
-		for ($i = 0; $i < rand(1, 1000); $i++) {
-			$stats[] = new class {
-				public int $id = 0;
-				public DateTime $createdAt;
-				public $type = null;
+	public function __construct(private HttpClientInterface $client) {}
 
-				public function __construct() {
-					$this->id = rand(1, 1000);
-					$this->createdAt = new DateTime();
-					$this->type = new class {
-						public int $id = 0;
-						public string $name = 'connard';
-						public string $description = '';
+	#[Route('', name: 'admin_stats')]
+    public function index(): Response
+    {
+        $response = $this->client->request('GET', 'http://localhost:8002/api/stat/all');
 
-						public function __construct() {
-							$this->id = rand(1, 1000);
-						}
-					};
-				}
-			};
-		}
+        if ($response->getStatusCode() !== 200) {
+            return new Response("Erreur lors de la récupération des statistiques", 500);
+        }
 
-		// Sort the stats by createdAt
+        $stats = $response->toArray();
 
-		return $this->render('stat/index.html.twig', [
-			'stats' => $stats,
-		]);
-	}
+        return $this->render('stat/stats.html.twig', [
+            'stats' => $stats,
+        ]);
+    }
 
 	#[Route('/stat/usage', name: 'app_stat_usage')]
 	public function index2(): Response
@@ -54,4 +38,5 @@ final class StatController extends AbstractController
 			'controller_name' => 'StatController',
 		]);
 	}
+
 }
