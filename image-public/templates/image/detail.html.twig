@@ -7,14 +7,17 @@
 {% block main %}
 	<section class="flex flex-col items-center justify-center min-h-100 mt-10 gap-4 bg-base-200">
 		<h2 class="text-3xl font-bold">{{ image.filename }}</h1>
-		<article class="card bg-base-100 w-96 shadow-sm">
-			<figure>
-				<img src="{{ image.url }}" alt="Image" />
-			</figure>
-			<p>
-				{# Date : {{ image.uploadedAt|date('Y-m-d H:i:s') }} #}
-			</p>
-		</article>
+	<article class="card bg-base-100 w-96 shadow-sm">
+		<figure>
+			<img src="{{ image.url }}" alt="Image" />
+		</figure>
+		<div class="card-body bg-base-100">
+			<a href="http://localhost:8002/api/image/download/{{ image.filename }}" class="btn btn-primary w-full" download>
+				Télécharger l'image
+			</a>
+		</div>
+	</article>
+
 	</section>
 
 	<section class="flex flex-col items-center justify-center min-h-50 gap-4 bg-base-200">
