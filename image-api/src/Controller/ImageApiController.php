@@ -37,6 +37,21 @@ class ImageApiController extends AbstractController
         return new JsonResponse($data);
     }
 
+    // Renvoie la liste complête des images coté admin.
+    #[Route('/api/admin/images', name: 'api_images_admin', methods: ['GET'])]
+    public function getImagesAdmin(ImageRepository $repo): JsonResponse
+    {
+        $images = $repo->findAll();
+
+        $data = array_map(fn($img) => [
+            'id' => $img->getId(),
+            'filename' => $img->getFilename(),
+            'url' => 'http://localhost:8002/api/admin/image/url/' . $img->getFilename(),
+        ], $images);
+
+        return new JsonResponse($data);
+    }
+
     // Enregistre une Image.
     #[Route('/api/upload', name: 'api_upload', methods: ['POST'])]
     public function apiUpload(Request $request, EntityManagerInterface $em, SluggerInterface $slugger): JsonResponse
@@ -141,6 +156,46 @@ class ImageApiController extends AbstractController
 
         return $response;
     }
+
+       // Renvoie les info d'une Image basé sur son nom de fichier. Coté admin.
+       #[Route('/api/admin/image/view/{filename}', name: 'api-image-view-admin', methods: ['GET'])]
+       public function getImageDataAdmin(
+           string $filename,
+           ImageRepository $imageRepo,
+           EntityManagerInterface $em
+           ): JsonResponse
+       {
+           $image = $imageRepo->findOneBy(['filename' => $filename]);
+       
+           if (!$image) {
+               throw new NotFoundHttpException('Image not found');
+           }
+       
+           $data = [
+               'id' => $image->getId(),
+               'filename' => $image->getFilename(),
+               'url' => 'http://localhost:8002/api/admin/image/url/' . $image->getFilename(),
+           ];
+       
+           return new JsonResponse($data);
+       }
+   
+       // Revoie le fichier de l'image directement. Coté admin.
+       #[Route('/api/admin/image/url/{filename}', name: 'api-image-url-admin', methods: ['GET'])]
+       public function getImageOnlyAdmin(
+           string $filename,
+           ImageRepository $imageRepo,
+           EntityManagerInterface $em
+           ): BinaryFileResponse
+       {
+           $filePath = $this->getParameter('kernel.project_dir') . '/public/uploads/' . $filename;
+   
+           if (!file_exists($filePath)) {
+               throw $this->createNotFoundException('Image not found');
+           }
+   
+           return new BinaryFileResponse($filePath, 200, [], false);
+       }
 
     // Revoie les stats pour toutes les images
     #[Route('/api/stat/all', name: 'api-stat_all', methods: ['GET'])]

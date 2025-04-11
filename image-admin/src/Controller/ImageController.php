@@ -25,7 +25,7 @@ class ImageController extends AbstractController
 	#[Route('', name: 'images', methods: ['GET'])]
 	public function list(): Response
 	{
-		$response = $this->client->request('GET', 'http://localhost:8002/api/images');
+		$response = $this->client->request('GET', 'http://localhost:8002/api/admin/images');
 
 		if ($response->getStatusCode() !== 200) {
 			return new Response('Erreur lors de la récupération des images', 500);
@@ -45,7 +45,7 @@ class ImageController extends AbstractController
 	#[Route('/{filename}', name: 'images_details', methods: ['GET'])]
 	public function details(string $filename): Response
 	{
-		$responseImage = $this->client->request('GET', "http://127.0.0.1:8002/api/image/view/$filename");
+		$responseImage = $this->client->request('GET', "http://127.0.0.1:8002/api/admin/image/view/$filename");
 
 		if ($responseImage->getStatusCode() !== 200) {
 			return new Response('Erreur lors de la récupération des images', 500);
