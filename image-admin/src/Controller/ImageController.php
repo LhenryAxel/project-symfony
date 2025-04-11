@@ -56,27 +56,22 @@ class ImageController extends AbstractController
 	/**
 	 * Delete an image
 	 */
-	#[Route('/{id}', name: 'images_delete', methods: ['DELETE'])]
+	#[Route('/delete/{id}', name: 'images_delete', methods: ['GET'])]
 	public function delete(Request $request, int $id): Response
 	{
-		$file = $request->files->get('file');
+		$response = $this->client->request('DELETE', "http://localhost:8002/api/image/delete/$id", [
+			'body' => [
+				'id' => $id,
+			],
+		]);
 
-		if ($file) {
-			$response = $this->client->request('DELETE', 'http://localhost:8002/api/images', [
-				'body' => [
-					'id' => $id,
-				],
+		if ($response->getStatusCode() === 200) {
+			return $this->redirectToRoute('images', [
+				'success' => true,
 			]);
+			
+		}    
 
-			if ($response->getStatusCode() === 201) {
-				return $this->render('image/delete.html.twig', [
-					'success' => true
-				]);
-			}    
-
-			return new Response('Erreur lors de l\'envois de la suppression vers l’API', 500);
-		}
-
-		return $this->render('image/delete.html.twig');
+		return new Response('Erreur lors de l\'envois de la suppression vers l’API', 500);
 	}
 }
