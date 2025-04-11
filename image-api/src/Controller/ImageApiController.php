@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Filesystem\Filesystem;
+
 
 class ImageApiController extends AbstractController
 {
@@ -223,6 +225,14 @@ class ImageApiController extends AbstractController
         $stats = $statRepo->findBy(['image' => $image]);
         foreach ($stats as $stat) {
             $em->remove($stat);
+        }
+        
+        // Suppression du fichier image physique
+        $filesystem = new Filesystem();
+        $imagePath = $this->getParameter('kernel.project_dir') . '/public/uploads/' . $image->getFilename();
+        
+        if ($filesystem->exists($imagePath)) {
+            $filesystem->remove($imagePath);
         }
 
         $em->remove($image);

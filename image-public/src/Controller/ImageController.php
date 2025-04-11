@@ -52,4 +52,20 @@ class ImageController extends AbstractController
         return $this->render('image/upload.html.twig');
     }
 
+
+    #[Route('/images/{filename}', name: 'images_details', methods: ['GET'])]
+	public function details(string $filename): Response
+	{
+		$response = $this->client->request('GET', "http://127.0.0.1:8002/api/image/view/$filename");
+
+		if ($response->getStatusCode() !== 200) {
+			return new Response('Erreur lors de la récupération des images', 500);
+		}
+
+		$image = $response->toArray();
+	
+		return $this->render('image/detail.html.twig', [
+			'image' => $image,
+		]);
+	}
 }
