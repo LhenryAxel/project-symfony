@@ -1,0 +1,15 @@
+<navbar class="navbar bg-base-100 shadow-sm sticky top-0 z-50">
+	{% block navbar %}
+		<div class="navbar-start">
+			<a class="btn btn-ghost text-xl">Public</a>
+		</div>
+
+		<div class="navbar-center hidden lg:flex">
+			<a class="btn" href="/images">Images</a>
+		</div>
+
+		<div class="navbar-end">
+			{# dont remove this, it breaks the navbar centering #}
+		</div>
+	{% endblock %}
+</navbar>
