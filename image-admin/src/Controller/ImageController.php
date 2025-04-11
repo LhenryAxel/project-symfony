@@ -19,6 +19,9 @@ class ImageController extends AbstractController
 		$this->client = $client;
 	}
 
+	/**
+	 * List images
+	 */
 	#[Route('', name: 'images', methods: ['GET'])]
 	public function list(): Response
 	{
@@ -36,19 +39,26 @@ class ImageController extends AbstractController
 	}
 
 
+	/**
+	 * View an image
+	 */
 	#[Route('/{filename}', name: 'images_details', methods: ['GET'])]
 	public function details(string $filename): Response
 	{
-		$response = $this->client->request('GET', "http://127.0.0.1:8002/api/image/view/$filename");
+		$responseImage = $this->client->request('GET', "http://127.0.0.1:8002/api/image/view/$filename");
 
-		if ($response->getStatusCode() !== 200) {
+		if ($responseImage->getStatusCode() !== 200) {
 			return new Response('Erreur lors de la récupération des images', 500);
 		}
 
-		$image = $response->toArray();
+		$responseStats = $this->client->request('GET', "http://127.0.0.1:8002/api/stat/$filename");
+
+		$image = $responseImage->toArray();
+		$stats = $responseStats->toArray();
 	
 		return $this->render('image/detail.html.twig', [
 			'image' => $image,
+			'stats' => $stats,
 		]);
 	}
 
