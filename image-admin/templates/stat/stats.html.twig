@@ -1,96 +1,135 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Statistiques{% endblock %}
+
+{% block header %}
+	<div class="hero bg-base-200 min-h-50">
+		<div class="hero-content text-center">
+			<div class="max-w-md">
+				<h1 class="text-4xl font-bold">Statistiques</h1>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
 {% block main %}
-    <main class="p-10">
-        <h1 class="text-4xl font-bold mb-6">Statistiques des images</h1>
+	<section class="p-10">
+		{% for message in app.flashes('success') %}
+			<div class="alert alert-success shadow-lg mb-4">
+				<div>
+					<span>{{ message }}</span>
+				</div>
+			</div>
+		{% endfor %}
+	</section>
 
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success shadow-lg mb-4">
-            <div>
-                <span>{{ message }}</span>
-            </div>
-        </div>
-    {% endfor %}
+	<section id="actions" class="flex flex-col items-center justify-center gap-8 bg-base-200 p-10">
+		<h2 class="text-3xl font-bold">Actions</h1>
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+			<article class="card bg-base-100 w-96 shadow-sm">
+				<div class="card-body items-center text-center">
+					<h2 class="card-title">Générer un fichier Excel</h2>
+					<form method="GET" action="{{ path('generate_excel') }}" class="flex flex-col items-center justify-center gap-4">
+						<label class="form-control w-full">
+							<div class="label"><span class="label-text">Nom du fichier (avec .xlsx)</span></div>
+							<input type="text" name="filename" class="input input-bordered w-full" placeholder="ex: stats.xlsx" required>
+						</label>
+	
+						<label class="form-control w-full">
+							<div class="label"><span class="label-text">Dossier de destination</span></div>
+							<input type="text" name="path" class="input input-bordered w-full" placeholder="ex: public (par défaut)">
+						</label>
+	
+						<button type="submit" class="btn btn-success w-full">Générer le fichier</button>
+					</form>
+				</div>
+			</article>
 
-    <h2 class="text-2xl font-bold mb-4">Générer un fichier Excel</h2>
-    <form method="GET" action="{{ path('generate_excel') }}" class="flex flex-col gap-4 mb-10 w-full max-w-md">
-        <label class="form-control w-full">
-            <div class="label"><span class="label-text">Nom du fichier (avec .xlsx)</span></div>
-            <input type="text" name="filename" class="input input-bordered w-full" placeholder="ex: stats.xlsx" required>
-        </label>
+			<article class="card bg-base-100 w-96 shadow-sm">
+				<div class="card-body items-center text-center">
+					<h2 class="card-title">Envoyer un mail informatif</h2>
+					<p class="text-center self-align-center">
+						Cette action enverra un email contenant les statistiques des images.<br>
+						Cet email est envoyé automatiquement chaque semaine.
+					</p>
+					<div class="card-actions">
+						<a href="{{ path('send_stats_email') }}" class="btn btn-info w-full">📧 Envoyer Email</a>
+					</div>
+				</div>
+			</article>
+		</div>
+	</section>
 
-        <label class="form-control w-full">
-            <div class="label"><span class="label-text">Dossier de destination</span></div>
-            <input type="text" name="path" class="input input-bordered w-full" placeholder="ex: public (par défaut)">
-        </label>
+	<section id="images-stats" class="flex flex-col items-center justify-center gap-8 bg-base-200 p-10">
+		<h2 class="text-3xl font-bold">Statistiques des images</h1>
+		
+		<article class="card bg-base-100 w-md lg:w-3/4 xl:w-1/2 shadow-sm">
+			<div class="card-body overflow-x-auto">
+				{# <h2 class="text-3xl font-bold">Statistiques des images</h1> #}
+				<table class="table w-full mb-8">
+					<thead>
+						<tr>
+							<th>Image</th>
+							<th>Vues</th>
+							<th>Requêtes</th>
+							<th>Téléchargements</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for stat in stats %}
+							<tr class="hover:bg-blue-100 even:bg-base-200 odd:bg-base-100">
+								<td>{{ stat.filename }}</td>
+								<td>{{ stat.view }}</td>
+								<td>{{ stat.request }}</td>
+								<td>{{ stat.download }}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</article>
+	</section>
 
-        <button type="submit" class="btn btn-primary w-full">Générer le fichier</button>
-    </form>
+	<section id="graph" class="flex flex-col p-10">
+		<h2 class="text-3xl font-bold text-center">Graphique des statistiques</h1>
+		<canvas id="statsChart" width="600" height="300"></canvas>
+	</section>
 
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script>
+		const ctx = document.getElementById('statsChart').getContext('2d');
 
-    <div class="flex gap-4 mb-6">
-        <a href="{{ path('send_stats_email') }}" class="btn btn-outline btn-info">📧 Envoyer Email</a>
-    </div>
-
-        <table class="table w-full mb-8">
-            <thead>
-                <tr>
-                    <th>Image</th>
-                    <th>Vues</th>
-                    <th>Requêtes</th>
-                    <th>Téléchargements</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for stat in stats %}
-                    <tr>
-                        <td>{{ stat.filename }}</td>
-                        <td>{{ stat.view }}</td>
-                        <td>{{ stat.request }}</td>
-                        <td>{{ stat.download }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <canvas id="statsChart" width="600" height="300"></canvas>
-    </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const ctx = document.getElementById('statsChart').getContext('2d');
-
-        const chart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: {{ stats|map(s => s.filename)|json_encode|raw }},
-                datasets: [
-                    {
-                        label: 'Vues',
-                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                        data: {{ stats|map(s => s.view)|json_encode|raw }}
-                    },
-                    {
-                        label: 'Requêtes',
-                        backgroundColor: 'rgba(255, 206, 86, 0.5)',
-                        data: {{ stats|map(s => s.request)|json_encode|raw }}
-                    },
-                    {
-                        label: 'Téléchargements',
-                        backgroundColor: 'rgba(75, 192, 192, 0.5)',
-                        data: {{ stats|map(s => s.download)|json_encode|raw }}
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Statistiques des images'
-                    }
-                }
-            }
-        });
-    </script>
+		const chart = new Chart(ctx, {
+			type: 'bar',
+			data: {
+				labels: {{ stats|map(s => s.filename)|json_encode|raw }},
+				datasets: [
+					{
+						label: 'Vues',
+						backgroundColor: 'rgba(54, 162, 235, 0.5)',
+						data: {{ stats|map(s => s.view)|json_encode|raw }}
+					},
+					{
+						label: 'Requêtes',
+						backgroundColor: 'rgba(255, 206, 86, 0.5)',
+						data: {{ stats|map(s => s.request)|json_encode|raw }}
+					},
+					{
+						label: 'Téléchargements',
+						backgroundColor: 'rgba(75, 192, 192, 0.5)',
+						data: {{ stats|map(s => s.download)|json_encode|raw }}
+					}
+				]
+			},
+			options: {
+				responsive: true,
+				plugins: {
+					title: {
+						display: true,
+						text: 'Statistiques des images'
+					}
+				}
+			}
+		});
+	</script>
 {% endblock %}
