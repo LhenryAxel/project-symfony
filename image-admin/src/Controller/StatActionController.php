@@ -7,25 +7,37 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+
 
 
 
 class StatActionController extends AbstractController
 {
     #[Route('/generate-excel', name: 'generate_excel')]
-    public function generateExcel(): Response
+    public function generateExcel(Request $request): Response
     {
+        $filename = $request->query->get('filename', 'monfichier2.xlsx');
+        $relativePath = $request->query->get('path', 'public');
+
         $projectPath = dirname($this->getParameter('kernel.project_dir')) . '/image-api';
+        $outputPath = $projectPath . '/' . trim($relativePath, '/');
         $consolePath = $projectPath . '/bin/console';
 
-        $process = new Process(['php', $consolePath, 'lc:excel', '--out', $projectPath . '/public/monfichier2.xlsx']);
+        if (!is_dir($outputPath)) {
+            mkdir($outputPath, 0777, true);
+        }
+
+        $fullFilePath = $outputPath . '/' . $filename;
+
+        $process = new Process(['php', $consolePath, 'lc:excel', '--out', $fullFilePath]);
         $process->run();
 
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
 
-        $this->addFlash('success', 'Fichier Excel généré dans le dossier : project-symfony/image-api/public');
+        $this->addFlash('success', "Fichier Excel généré : {$relativePath}/{$filename}");
         return $this->redirectToRoute('admin_stats');
     }
 
