@@ -11,9 +11,13 @@
 				<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
 					<div class="flex w-full flex-col">
 						<li><a href="/stat">Voir les statistiques</a></li>
-						<div class="divider">Actions rapides</div>
-						<li><a href="{{ path('generate_excel') }}" class="btn btn-outline btn-success">📊 Générer Excel</a></li>
-						<li><a href="{{ path('send_stats_email') }}" class="btn btn-outline btn-info">📧 Envoyer Email</a></li>
+						<div class="divider">Actions</div>
+						<li><a href="/stat#action-excel" class="btn btn-outline">📊 Générer Excel</a></li>
+						<li><a href="/stat#action-mail" class="btn btn-outline mt-2">📧 Envoyer Email</a></li>
+						<div class="divider">Statistiques</div>
+						<li><a href="/stat#table-images" class="btn btn-outline">Statistiques des images</a></li>
+						<div class="divider">Graphiques</div>
+						<li><a href="/stat#graph-images" class="btn btn-outline">Graphique des images</a></li>
 					</div>
 				</ul>
 			</div>
