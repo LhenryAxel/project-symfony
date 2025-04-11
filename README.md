@@ -22,18 +22,19 @@ Ce projet Symfony se compose de **trois sous-applications distinctes** :
 - Ajout automatique de statistiques (vues, requêtes, téléchargements)
 - API REST :
   - `GET /api/images` : Liste des images
-  - `GET /api/image/view/{filename}` : Vue d'une image
-  - `GET /api/image/url/{filename}` : Accès direct à l'image
+  - `POST /api/upload` : Upload d'image
+  - `GET /api/image/view/{filename}` : Vue d'une image (+ stat Vue)
+  - `GET /api/image/url/{filename}` : Accès direct à l'image (+ stat RequeteUrl)
   - `GET /api/image/download/{filename}` : Téléchargement + stat
   - `GET /api/stat/{filename}` : Statistiques d'une image
   - `GET /api/stat/all` : Statistiques de toutes les images
+  - `DELETE /api/image/delete/{id}` : Supprimer une image + stats associées
 
 ### ✅ `image-admin`
 - Interface de visualisation des images
 - Détails et graphiques de stats via Chart.js
 - Génération de fichier Excel
 - Envoi d'email automatique ou manuel
-- Redirection de l'accueil vers `/images`
 
 ---
 
