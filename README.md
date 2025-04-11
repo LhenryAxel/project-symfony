@@ -10,7 +10,7 @@ Ce projet Symfony se compose de **trois sous-applications distinctes** :
 
 ---
 
-## 📆 Fonctionnalités principales
+## 📦 Fonctionnalités principales
 
 ### ✅ `image-public`
 - Formulaire pour uploader une image
@@ -61,16 +61,11 @@ php bin/console doctrine:fixtures:load --append
 ```
 
 ### 4. Lancer les serveurs Symfony
-Dans chaque dossier, utilisez la commande suivante avec un port différent :
+Dans chaque dossier (`image-api`, `image-admin`, `image-public`), exécutez :
 ```bash
-# Dans image-public
-symfony server:start --port=8000
-
-# Dans image-admin
-symfony server:start --port=8001
-
-# Dans image-api
-symfony server:start --port=8002
+symfony server:start --port=8000 # pour image-public
+symfony server:start --port=8001 # pour image-admin
+symfony server:start --port=8002 # pour image-api
 ```
 
 ### 5. Accéder à l'application
@@ -102,6 +97,26 @@ php bin/console messenger:consume scheduler_default -vv
 
 ---
 
+## ⚙️ Dépendances Composer
+
+Avant de lancer le projet, assurez-vous d’avoir installé toutes les dépendances avec :
+
+```bash
+composer install
+```
+
+Cela installera automatiquement toutes les librairies nécessaires déclarées dans les fichiers `composer.json` de chaque dossier (`image-api`, `image-admin`, `image-public`).
+
+### Principales librairies utilisées :
+
+- `phpoffice/phpspreadsheet` : Génération de fichiers Excel
+- `symfony/mailer` : Envoi d’emails
+- `symfony/scheduler` : Tâches planifiées
+- `symfony/http-client` : Requêtes entre les applications
+- `symfony/messenger` : Gestion des workers pour les emails planifiés
+
+---
+
 ## 📁 Arborescence simplifiée
 ```
 project-symfony/
@@ -113,13 +128,6 @@ project-symfony/
 ├── image-public/
     └── templates/upload.html.twig
 ```
-
----
-
-## 💡 À noter
-- Tous les boutons d'action dans `image-admin` (générer Excel, envoyer email) utilisent les commandes personnalisées du projet.
-- Vous pouvez configurer les noms et emplacements des fichiers Excel générés via l'interface admin.
-- L'ensemble est pensé pour fonctionner localement mais peut être déployé facilement avec un `.env` adapté.
 
 ---
 
