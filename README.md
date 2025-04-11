@@ -85,7 +85,7 @@ php bin/console doctrine:fixtures:load --append
 
 ### 🎯 Générer un fichier Excel des statistiques
 ```bash
-php bin/console lc:excel --out monfichier2.xlsx
+php bin/console lc:excel --out monfichier.xlsx
 ```
 > Le fichier sera généré dans `image-api/public/`
 
