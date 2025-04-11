@@ -10,7 +10,7 @@ Ce projet Symfony se compose de **trois sous-applications distinctes** :
 
 ---
 
-## 📦 Fonctionnalités principales
+## 📆 Fonctionnalités principales
 
 ### ✅ `image-public`
 - Formulaire pour uploader une image
@@ -45,34 +45,35 @@ Ce projet Symfony se compose de **trois sous-applications distinctes** :
 git clone <repo>
 ```
 
-### 2. Créer la base de données
-Créez une base de données nommée :
-```bash
-open_image_db
-```
-
-### 3. Lancer les serveurs Symfony
-Dans chaque dossier (`image-api`, `image-admin`, `image-public`) :
-```bash
-symfony serve -d
-```
-> Exemple pour `image-api` : http://localhost:8002
-
-### 4. Configurer `.env`
+### 2. Configurer `.env`
 Configurer la base de données, et pour l'envoi d'email, modifier :
 ```env
 MAILER_DSN=smtp://<identifiants SMTP>
 ```
 > En développement, vous pouvez utiliser [Mailtrap](https://mailtrap.io/) pour tester l'envoi.
 
-### 5. Créer la base de données et charger les fixtures
+### 3. Créer et préparer la base de données
+> Une base de données nommée `open_image_db` sera automatiquement créée si elle n'existe pas.
 ```bash
 php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
 php bin/console doctrine:fixtures:load --append
 ```
 
-### 6. Accéder à l'application
+### 4. Lancer les serveurs Symfony
+Dans chaque dossier, utilisez la commande suivante avec un port différent :
+```bash
+# Dans image-public
+symfony server:start --port=8000
+
+# Dans image-admin
+symfony server:start --port=8001
+
+# Dans image-api
+symfony server:start --port=8002
+```
+
+### 5. Accéder à l'application
 - Interface publique : http://localhost:8000
 - Interface admin : http://localhost:8001
 - API : http://localhost:8002
