@@ -27,7 +27,7 @@
 		<h2 class="text-3xl font-bold">Actions</h1>
 		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 			<article class="card bg-base-100 w-96 shadow-sm">
-				<div class="card-body items-center text-center">
+				<div id="action-excel" class="card-body items-center text-center">
 					<h2 class="card-title">Générer un fichier Excel</h2>
 					<form method="GET" action="{{ path('generate_excel') }}" class="flex flex-col items-center justify-center gap-4">
 						<label class="form-control w-full">
@@ -46,7 +46,7 @@
 			</article>
 
 			<article class="card bg-base-100 w-96 shadow-sm">
-				<div class="card-body items-center text-center">
+				<div id="action-mail" class="card-body items-center text-center">
 					<h2 class="card-title">Envoyer un mail informatif</h2>
 					<p class="text-center self-align-center">
 						Cette action enverra un email contenant les statistiques des images.<br>
@@ -63,7 +63,7 @@
 	<section id="images-stats" class="flex flex-col items-center justify-center gap-8 bg-base-200 p-10">
 		<h2 class="text-3xl font-bold">Statistiques des images</h1>
 		
-		<article class="card bg-base-100 w-md lg:w-3/4 xl:w-1/2 shadow-sm">
+		<article id="table-images" class="card bg-base-100 w-md lg:w-3/4 shadow-sm">
 			<div class="card-body overflow-x-auto">
 				{# <h2 class="text-3xl font-bold">Statistiques des images</h1> #}
 				<table class="table w-full mb-8">
@@ -90,9 +90,11 @@
 		</article>
 	</section>
 
-	<section id="graph" class="flex flex-col p-10">
-		<h2 class="text-3xl font-bold text-center">Graphique des statistiques</h1>
-		<canvas id="statsChart" width="600" height="300"></canvas>
+	<section id="graph" class="flex flex-col items-center justify-center gap-8 bg-base-200 p-10">
+		<h2 class="text-3xl font-bold">Graphique des images</h1>
+		<article id="graph-images" class="card bg-base-100 w-md lg:w-3/4 shadow-sm">
+			<canvas id="statsChart" width="600" height="300"></canvas>
+		</article>
 	</section>
 
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
