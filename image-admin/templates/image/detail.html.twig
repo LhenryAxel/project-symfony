@@ -12,9 +12,9 @@
 			<figure>
 				<img src="{{ image.url }}" alt="Image" />
 			</figure>
-			<p>
-				{# Date : {{ image.uploadedAt|date('Y-m-d H:i:s') }} #}
-			</p>
+			<button class="btn btn-error">
+				<a href="images/delete/{{ image.id }}">Supprimer</a>
+			</button>
 		</article>
 	</section>
 

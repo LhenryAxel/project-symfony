@@ -5,9 +5,15 @@
 		</div>
 
 		<div class="navbar-center hidden lg:flex">
-			<div class="flex gap-4">
-				<a class="btn" href="/images">Images</a>
-				<a class="btn" href="/upload">Upload</a>
+			<div class="dropdown dropdown-hover dropdown-bottom dropdown-center">
+				<a role="button" class="btn m-1" href="/images">Images</a>
+				<ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+					<div class="flex w-full flex-col">
+						<li><a href="/images">List des images</a></li>
+						<div class="divider">Actions</div>
+						<li><a href="/upload" class="btn btn-outline">Publier une image</a></li>
+					</div>
+				</ul>
 			</div>
 		</div>
 

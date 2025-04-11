@@ -1,11 +1,27 @@
 {% extends 'base.html.twig' %}
 
+{% block title %} Liste des images {% endblock %}
 
+{% block header %}
+	<div class="hero bg-base-200 min-h-100">
+		<div class="hero-content text-center">
+			<div class="max-w-md">
+				<h1 class="text-5xl font-bold">Liste des images</h1>
+				<p class="py-6">
+					
+				</p>
+				<button class="btn btn-primary">
+					<a href="/upload">Publier une image</a>
+				</button>
+			</div>
+		</div>
+	</div>
+{% endblock %}
 
 {% block main %}
 	<main class="flex flex-col items-center justity-center bg-base-200">
 		<section class="flex flex-col items-center justity-center">
-			<h2 class="text-3xl font-bold">Images disponibles</h1>
+			<h2 class="text-3xl font-bold">Images disponibles</h2>
 
 			<div class="flex flex-row items-center justity-center flex-wrap gap-4 p-4">
 				{% for image in images %}
