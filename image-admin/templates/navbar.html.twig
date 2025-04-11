@@ -12,7 +12,8 @@
 					<div class="flex w-full flex-col">
 						<li><a href="/stats">Voir les statistiques</a></li>
 						<div class="divider">Actions rapides</div>
-						<li><a href="">Télecharger les statistiques</a></li>
+						<li><a href="{{ path('generate_excel') }}" class="btn btn-outline btn-success">📊 Générer Excel</a></li>
+						<li><a href="{{ path('send_stats_email') }}" class="btn btn-outline btn-info">📧 Envoyer Email</a></li>
 					</div>
 				</ul>
 			</div>
