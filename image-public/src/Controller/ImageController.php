@@ -38,22 +38,27 @@ class ImageController extends AbstractController
     #[Route('/upload', name: 'image_upload')]
     public function upload(Request $request): Response
     {
-        $file = $request->files->get('file');
+        if ($request->isMethod('POST')) {
+            $file = $request->files->get('file');
 
-        if ($file) {
-            $response = $this->client->request('POST', 'http://localhost:8002/api/upload', [
-                'body' => [
-                    'file' => fopen($file->getPathname(), 'r'),
-                ],
-            ]);
-
-            if ($response->getStatusCode() === 201) {
-                return $this->render('image/upload.html.twig', [
-                    'success' => true
+            if ($file) {
+                $response = $this->client->request('POST', 'http://localhost:8002/api/upload', [
+                    'body' => [
+                        'file' => fopen($file->getPathname(), 'r'),
+                    ],
                 ]);
-            }    
 
-            return new Response('Erreur lors de l\'upload vers l’API', 500);
+                if ($response->getStatusCode() === 201) {
+                    $this->addFlash('success', 'L\'image a été publiée avec succès.');
+                } else {
+                    $this->addFlash('error', 'Une erreur est survenue lors de l\'envoi du fichier à l’API.');
+                }
+
+                return $this->redirectToRoute('image_upload');
+            }
+
+            $this->addFlash('error', 'Aucun fichier n\'a été sélectionné.');
+            return $this->redirectToRoute('image_upload');
         }
 
         return $this->render('image/upload.html.twig');
